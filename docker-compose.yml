@@ -8,7 +8,7 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.app-ofertas.rule=HostRegexp(`{host:.+}`)"
+        - "traefik.http.routers.app-ofertas.rule=Host(`app-ofertas.wrtec.com.br`) || Host(`ofertasportonovo.awecloudsolution.com`)"
         - "traefik.http.routers.app-ofertas.entrypoints=websecure"
         - "traefik.http.routers.app-ofertas.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.app-ofertas.loadbalancer.server.port=80"
