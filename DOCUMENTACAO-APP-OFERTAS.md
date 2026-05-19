@@ -36,27 +36,33 @@ app-ofertas (NOVO)  |  Build → Push GHCR → Webhook                  |  app-o
 
 # Estrutura do Novo Repositório
 📁 app-ofertas/
-├── .github/workflows/docker.yml    (igual ao admin-ofertas)
-├── Dockerfile                       (multi-stage node → nginx)
-├── nginx.conf                       (SPA routing + cache + SEO)
-├── package.json
-├── vite.config.js
-├── src/
-│   ├── api/
-│   │   └── public.js               (chamadas à API sem auth)
-│   ├── App.jsx                      (rotas públicas)
-│   ├── main.jsx
-│   ├── components/
-│   │   ├── Header.jsx               (logo + cores do tenant)
-│   │   ├── OfferCard.jsx
-│   │   └── ...
-│   └── pages/
-│       ├── Home.jsx                 (destaques)
-│       ├── Offers.jsx               (todas ofertas)
-│       ├── StoreDetail.jsx
-│       └── ProductDetail.jsx
-└── public/
-    └── favicon.ico
+├── .github/workflows/docker.yml     ← CI/CD
+├── Dockerfile                       ← Build multi-stage
+├── nginx.conf                       ← SPA routing + cache
+├── package.json                     ← Dependências
+├── vite.config.js                   ← Config + proxy
+├── index.html                       ← Entry point HTML
+├── public/
+│   └── favicon.svg                  ← Ícone carrinho
+└── src/
+    ├── main.jsx                     ← Bootstrap React
+    ├── App.jsx                      ← Rotas públicas
+    ├── styles/
+    │   └── index.css                ← Tailwind + CSS variables
+    ├── api/
+    │   └── public.js                ← Chamadas à API
+    ├── components/
+    │   ├── BrandingProvider.jsx     ← Aplica cores/fonte/logo do tenant
+    │   ├── Header.jsx               ← Navbar responsiva
+    │   ├── OfferCard.jsx            ← Card de oferta com preço/desconto
+    │   └── Footer.jsx               ← Rodapé
+    └── pages/
+        ├── Home.jsx                 ← Hero + destaques + categorias
+        ├── Offers.jsx               ← Grid de ofertas com filtro loja
+        ├── Products.jsx             ← Produtos com busca + filtro
+        ├── Stores.jsx               ← Lista de lojas
+        ├── ProductDetail.jsx        ← Detalhe do produto
+        └── StoreDetail.jsx          ← Loja + ofertas da loja
 
 # 🚀 Próximos PassosSequência recomendada:
 |-|-------------------------------------------|---------------------------------------------------|
