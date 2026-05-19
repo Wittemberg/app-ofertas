@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  app:
+    image: ghcr.io/wittemberg/app-ofertas:latest
+    networks:
+      - interna
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.app-ofertas.rule=Host(`app-ofertas.wrtec.com.br`)"
+        - "traefik.http.routers.app-ofertas.entrypoints=websecure"
+        - "traefik.http.routers.app-ofertas.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.app-ofertas.loadbalancer.server.port=80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+networks:
+  interna:
+    external: true
