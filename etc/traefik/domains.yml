@@ -1,0 +1,10 @@
+http:
+  routers:
+    app-ofertas-tls:
+      rule: "Host(`app-ofertas.wrtec.com.br`) || Host(`ofertasportonovo.awecloudsolution.com`)"
+      entrypoints:
+        - websecure
+      service: app-ofertas_app
+      tls:
+        certResolver: letsencryptresolver
+      priority: 10
