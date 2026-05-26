@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { getProducts } from '../api/public'
+import { useCart } from '../components/CartProvider'
 
 export default function ProductDetail() {
   const { slug } = useParams()
+  const cart = useCart()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -90,6 +92,17 @@ export default function ProductDetail() {
                     <p><span className="text-gray-400">Unidade:</span> {product.unit}</p>
                   )}
                 </div>
+
+                {cart?.enabled && (
+                  <button
+                    type="button"
+                    onClick={() => cart.addProduct(product)}
+                    className="mt-6 w-full rounded-lg py-3 text-sm font-semibold text-white transition"
+                    style={{ backgroundColor: 'var(--primary)' }}
+                  >
+                    Adicionar a lista
+                  </button>
+                )}
               </div>
             </div>
           </div>
