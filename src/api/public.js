@@ -39,3 +39,27 @@ export async function getCategories() {
   const res = await axios.get(`${API}/api/public/categories`, { params: { domain } })
   return res.data
 }
+
+export async function createCartSession(payload) {
+  const res = await axios.post(`${API}/api/public/cart-sessions`, {
+    domain: getDomain(),
+    ...payload
+  })
+  return res.data
+}
+
+export async function updateCartSession(id, payload) {
+  const res = await axios.put(`${API}/api/public/cart-sessions/${id}`, {
+    domain: getDomain(),
+    ...payload
+  })
+  return res.data
+}
+
+export async function submitOrder(payload) {
+  const res = await axios.post(`${API}/api/public/orders`, {
+    domain: getDomain(),
+    ...payload
+  })
+  return res.data
+}

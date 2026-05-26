@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { useCart } from './CartProvider'
 
 export default function OfferCard({ offer }) {
+  const cart = useCart()
   const { product, store, price_from, price_to, is_featured } = offer
   const hasDiscount = price_from && parseFloat(price_to) < parseFloat(price_from)
   const discountPercent = hasDiscount
@@ -8,7 +10,7 @@ export default function OfferCard({ offer }) {
     : 0
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition ${is_featured ? 'ring-2 ring-accent/30' : ''}`}>
+    <div className={`relative bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition ${is_featured ? 'ring-2 ring-accent/30' : ''}`}>
       <div className="h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
         {product?.image_url ? (
           <img src={product.image_url} alt={product.name} className="w-full h-full object-contain p-4" />
@@ -48,12 +50,24 @@ export default function OfferCard({ offer }) {
           </p>
         )}
 
-        <Link
-          to={`/produto/${product?.internal_code || product?.id}`}
-          className="block w-full text-center py-2 rounded-lg text-sm font-medium transition btn-primary"
-        >
-          Ver detalhes
-        </Link>
+        <div className="grid gap-2">
+          {cart?.enabled && (
+            <button
+              type="button"
+              onClick={() => cart.addOffer(offer)}
+              className="w-full rounded-lg py-2 text-sm font-semibold text-white transition"
+              style={{ backgroundColor: 'var(--primary)' }}
+            >
+              Adicionar a lista
+            </button>
+          )}
+          <Link
+            to={`/produto/${product?.internal_code || product?.id}`}
+            className="block w-full text-center py-2 rounded-lg text-sm font-medium transition btn-primary"
+          >
+            Ver detalhes
+          </Link>
+        </div>
       </div>
     </div>
   )
