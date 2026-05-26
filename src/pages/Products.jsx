@@ -3,8 +3,10 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { getProducts, getCategories } from '../api/public'
 import { Link } from 'react-router-dom'
+import { useCart } from '../components/CartProvider'
 
 export default function Products() {
+  const cart = useCart()
   const [products, setProducts] = useState([])
   const [total, setTotal] = useState(0)
   const [categories, setCategories] = useState([])
@@ -85,20 +87,20 @@ export default function Products() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {products.map(product => (
-                  <Link
-                    key={product.id}
-                    to={`/produto/${product.internal_code || product.id}`}
-                    className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition"
-                  >
-                    <div className="h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
-                      {product.image_url ? (
-                        <img src={product.image_url} alt={product.name} className="w-full h-full object-contain p-4" />
-                      ) : (
-                        <span className="text-4xl text-gray-300">📦</span>
-                      )}
-                    </div>
+                  <div key={product.id} className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition">
+                    <Link to={`/produto/${product.internal_code || product.id}`}>
+                      <div className="h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.name} className="w-full h-full object-contain p-4" />
+                        ) : (
+                          <span className="text-4xl text-gray-300">📦</span>
+                        )}
+                      </div>
+                    </Link>
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
+                      <Link to={`/produto/${product.internal_code || product.id}`} className="block">
+                        <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
+                      </Link>
                       {product.internal_code && (
                         <p className="text-xs text-gray-400">Cód: {product.internal_code}</p>
                       )}
@@ -107,8 +109,18 @@ export default function Products() {
                           {product.category.name}
                         </span>
                       )}
+                      {cart?.enabled && (
+                        <button
+                          type="button"
+                          onClick={() => cart.addProduct(product)}
+                          className="mt-3 w-full rounded-lg py-2 text-sm font-semibold text-white transition"
+                          style={{ backgroundColor: 'var(--primary)' }}
+                        >
+                          Adicionar a lista
+                        </button>
+                      )}
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
 

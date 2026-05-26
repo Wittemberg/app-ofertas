@@ -24,9 +24,18 @@ function itemPayload(item) {
   }
 }
 
+function itemPrice(item) {
+  const value = Number(item.offer.price_to || 0)
+  return Number.isFinite(value) && value > 0 ? value : null
+}
+
+function isEnabled(value) {
+  return value === true || value === 1 || value === '1' || value === 'true'
+}
+
 export default function CartProvider({ children }) {
   const { tenant } = useBranding()
-  const enabled = Boolean(tenant?.orders_enabled)
+  const enabled = isEnabled(tenant?.orders_enabled)
   const storageKey = tenant?.id ? `offers-cart:${tenant.id}` : 'offers-cart'
   const [items, setItems] = useState([])
   const [customer, setCustomer] = useState({ name: '', phone: '' })
@@ -54,7 +63,7 @@ export default function CartProvider({ children }) {
   }, [items, customer, cartSessionId, note, storageKey, tenant?.id])
 
   const total = useMemo(() => {
-    return items.reduce((sum, item) => sum + Number(item.offer.price_to || 0) * item.quantity, 0)
+    return items.reduce((sum, item) => sum + (itemPrice(item) || 0) * item.quantity, 0)
   }, [items])
 
   const apiItems = (nextItems = items) => nextItems.map(itemPayload)
@@ -103,6 +112,10 @@ export default function CartProvider({ children }) {
       return
     }
     addOfferNow(offer)
+  }
+
+  const addProduct = (product) => {
+    addOffer({ product, price_to: null })
   }
 
   const saveCustomer = async (event) => {
@@ -178,7 +191,8 @@ export default function CartProvider({ children }) {
     items,
     count: items.reduce((sum, item) => sum + item.quantity, 0),
     total,
-    addOffer
+    addOffer,
+    addProduct
   }
 
   return (
@@ -215,6 +229,7 @@ export default function CartProvider({ children }) {
                   <div className="space-y-3">
                     {items.map(item => {
                       const key = offerKey(item.offer)
+                      const price = itemPrice(item)
                       return (
                         <div key={key} className="rounded-lg border p-3">
                           <div className="flex gap-3">
@@ -223,7 +238,7 @@ export default function CartProvider({ children }) {
                             )}
                             <div className="flex-1">
                               <p className="text-sm font-semibold text-gray-900">{item.offer.product?.name || 'Produto'}</p>
-                              <p className="text-sm font-bold text-red-600">{toMoney(item.offer.price_to)}</p>
+                              <p className="text-sm font-bold text-red-600">{price ? toMoney(price) : 'Preco sob consulta'}</p>
                               <div className="mt-2 flex items-center gap-2">
                                 <button type="button" onClick={() => updateQuantity(key, item.quantity - 1)} className="h-8 w-8 rounded border">-</button>
                                 <span className="w-8 text-center text-sm">{item.quantity}</span>
@@ -251,7 +266,7 @@ export default function CartProvider({ children }) {
                     </label>
                     <div className="flex items-center justify-between text-lg font-bold">
                       <span>Total estimado</span>
-                      <span>{toMoney(total)}</span>
+                      <span>{total > 0 ? toMoney(total) : 'Sob consulta'}</span>
                     </div>
                     <button
                       type="button"
