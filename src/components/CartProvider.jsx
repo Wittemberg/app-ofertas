@@ -47,6 +47,7 @@ export default function CartProvider({ children }) {
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [cartVersion, setCartVersion] = useState(0)
 
   useEffect(() => {
     if (!tenant?.id) return
@@ -60,13 +61,27 @@ export default function CartProvider({ children }) {
   useEffect(() => {
     if (!tenant?.id) return
     localStorage.setItem(storageKey, JSON.stringify({ items, customer, cartSessionId, note }))
-  }, [items, customer, cartSessionId, note, storageKey, tenant?.id])
+  }, [items, customer, cartSessionId, note, storageKey, tenant?.id, cartVersion])
 
   const total = useMemo(() => {
     return items.reduce((sum, item) => sum + (itemPrice(item) || 0) * item.quantity, 0)
   }, [items])
 
   const apiItems = (nextItems = items) => nextItems.map(itemPayload)
+
+  const clearCart = () => {
+    setItems([])
+    setCartSessionId('')
+    setNote('')
+    setPendingOffer(null)
+    setCartVersion(version => version + 1)
+    localStorage.setItem(storageKey, JSON.stringify({
+      items: [],
+      customer,
+      cartSessionId: '',
+      note: ''
+    }))
+  }
 
   const syncSession = async (nextItems, nextCustomer = customer) => {
     if (!enabled || !nextCustomer.name || !nextCustomer.phone || nextItems.length === 0) return
@@ -173,9 +188,7 @@ export default function CartProvider({ children }) {
         items: apiItems()
       })
       setMessage('Lista enviada com sucesso.')
-      setItems([])
-      setCartSessionId('')
-      setNote('')
+      clearCart()
       if (order.whatsapp_url) {
         window.open(order.whatsapp_url, '_blank', 'noopener,noreferrer')
       }
