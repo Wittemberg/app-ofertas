@@ -51,6 +51,7 @@ Quando `tenant.orders_enabled` estiver ativo, o site publico mostra:
 - lista persistida no navegador
 - sincronizacao com `cart_sessions` na API
 - envio final para `POST /api/public/orders`
+- limpeza do carrinho local apos pedido enviado com sucesso
 
 Fluxo:
 
@@ -58,8 +59,43 @@ Fluxo:
 2. Ao adicionar o primeiro item, informa nome e WhatsApp.
 3. A API cria uma sessao de carrinho.
 4. Cada alteracao atualiza a sessao.
-5. Ao finalizar, a API salva o pedido, envia e-mail e retorna link de WhatsApp.
-6. Se houver link de WhatsApp, o app abre a conversa com a mensagem pronta.
+5. A sessao permite medir carrinho ativo e carrinho abandonado.
+6. Ao finalizar, a API salva o pedido, registra historico inicial, envia e-mail e retorna link de WhatsApp.
+7. Se houver link de WhatsApp, o app abre a conversa com a mensagem pronta.
+8. O carrinho local e limpo para evitar reutilizar quantidades antigas em uma nova lista.
+
+## Regras de Carrinho Abandonado
+
+O tempo de inatividade e configuravel por tenant no painel administrativo, em `cart_abandonment_minutes`.
+
+O site publico apenas envia as atividades para a API:
+
+- criacao da sessao no primeiro item;
+- atualizacao da lista quando itens mudam;
+- conversao da sessao quando o pedido e finalizado.
+
+A classificacao de abandono e calculada pela API/dashboard com base na ultima atividade.
+
+## Envio de Pedido
+
+O pedido enviado pelo site publico contem:
+
+- nome do cliente;
+- WhatsApp do cliente;
+- observacao opcional;
+- loja selecionada, quando houver;
+- itens com quantidade;
+- origem `site`.
+
+A API salva snapshots dos itens para que alteracoes futuras de produto/oferta nao mudem o historico do pedido.
+
+No painel administrativo, esse pedido aparece em:
+
+- dashboard;
+- tela `/pedidos`;
+- mesa `/atendimento`;
+- relatorios CSV;
+- historico de status.
 
 ## API Publica Usada
 
@@ -83,8 +119,8 @@ Build multi-stage com Node e Nginx. O deploy roda via GitHub Actions, imagem no 
 ## Proximos Passos
 
 - Tela publica de acompanhamento de pedido, se necessario.
-- Modo balcao para loja receber pedidos em tempo quase real.
 - Integracao de pedidos com ERP.
-- Alertas sonoros/visuais no painel administrativo.
+- Melhorias visuais no modal de carrinho para mobile.
+- Identificacao opcional de loja preferida antes de adicionar itens.
 
-Atualizado em 26/05/2026.
+Atualizado em 27/05/2026.
